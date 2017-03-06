@@ -1,0 +1,161 @@
+doctype html
+html
+ head
+ include head.pug
+body
+
+  .container
+    .row#headerRow
+      #header.col-md-12.hidden-xs
+        //.col-md-4
+        .col-md-4#title
+          h1 Tennessee Barbecue
+        .col-md-4#image
+          img#logo.img-responsive(src="bbq_flag_150.png")
+        .col-md-4#navDiv
+          ul#nav
+            li About
+            li Contact
+            li Blog
+    .row#mapRow
+       #map.col-md-9
+       #jointBox.col-md-3
+        h1#latty Loading Data...
+
+script(type='text/javascript').
+     var map;
+     markerArray = [];
+     //google maps' initialization function
+     function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 35.86188569999999, lng: -86.36057679999999},
+      zoom: 7,
+      gestureHandling: 'greedy',
+      styles: [
+        {
+            "featureType": "road",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "visibility": "simplified"
+                }
+            ]
+        },
+        {
+            "featureType": "road.arterial",
+            "stylers": [
+                {
+                    "hue": 149
+                },
+                {
+                    "saturation": -78
+                },
+                {
+                    "lightness": 0
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "stylers": [
+                {
+                    "hue": -31
+                },
+                {
+                    "saturation": -40
+                },
+                {
+                    "lightness": 2.8
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "label",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "landscape",
+            "stylers": [
+                {
+                    "hue": 163
+                },
+                {
+                    "saturation": -26
+                },
+                {
+                    "lightness": -1.1
+                }
+            ]
+        },
+        {
+            "featureType": "transit",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "stylers": [
+                {
+                    "hue": 3
+                },
+                {
+                    "saturation": -24.24
+                },
+                {
+                    "lightness": -38.57
+                }
+            ]
+        }
+      ]
+     });
+     map.setMapTypeId('roadmap');   
+
+     //creates a map marker for each item in joints list
+     for(i=0; i < joints.length; i++){
+      createMapMarker(joints[i].LatLng, joints[i].address, joints[i].name, joints[i].website, i);
+      joints[i].id = i;
+     };
+        
+
+    //builds an array of the joint markers that are within map bound and a separate array with the names of each
+    function buildJointArray(){   
+
+     jointArray = [];
+     nameSet = [];
+     for(i=0; i < markerArray.length; i++){
+      if (map.getBounds().contains(markerArray[i].getPosition())){
+       if ($.inArray(markerArray[i].title, nameSet) === -1){
+        nameSet.push(markerArray[i].title);
+       };
+      };
+     };
+     for(i=0; i < nameSet.length; i++){
+      joint = nameSet[i];
+      jointArray.push("<div onmouseover='addBounceAnimation(" + joints.find(findr).id + ")' onmouseleave='removeBounceAnimation(" + joints.find(findr).id + ")'class='listing' id='joint" + joints.find(findr).id + "'><h3>" + joints.find(findr).name + "</h3>" + "<p>" + joints.find(findr).address + "</p></div>");
+      };    
+
+     document.getElementById("jointBox").innerHTML = jointArray.join("");
+    };    
+
+    map.addListener('bounds_changed', buildJointArray);   
+    
+
+     };
+script(type='text/javascript').
+      //functions to set and remove marker bounce animation
+      function addBounceAnimation(number){markerArray[number].setAnimation(google.maps.Animation.BOUNCE)};
+      function removeBounceAnimation(number){markerArray[number].setAnimation(null)};
+      for(i=0; i <= markerArray.length; i++){ var num = i;
+        $('#joint' + i).bind('click', addBounceAnimation(i))};
+        
+script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyC5iGenv60inoJ4DfmOQb7hAzUBjtHL2js&callback=initMap', async='', defer='').
+
+
